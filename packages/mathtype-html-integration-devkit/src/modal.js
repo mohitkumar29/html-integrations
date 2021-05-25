@@ -968,7 +968,7 @@ export default class ModalDialog {
     Util.addEvent(window, 'mousemove', this.drag.bind(this));
     Util.addEvent(window, 'resize', this.onWindowResize.bind(this));
     // Key events.
-    Util.addEvent(this.container, 'keydown', this.onKeyDown.bind(this));
+    Util.addEvent(window, 'keydown', this.onKeyDown.bind(this));
   }
 
   /**
