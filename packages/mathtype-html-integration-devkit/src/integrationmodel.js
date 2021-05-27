@@ -5,6 +5,7 @@ import Listeners from './listeners';
 import Util from './util';
 import Configuration from './configuration';
 import ServiceProvider from './serviceprovider';
+import Clipboard from './clipboard';
 
 /**
  * @typedef {Object} IntegrationModelProperties
@@ -270,6 +271,9 @@ export default class IntegrationModel {
   setTarget(target) {
     this.target = target;
     this.isIframe = (this.target.tagName.toUpperCase() === 'IFRAME');
+
+    // Add listener to purge pasted formulas
+    Clipboard.setPasteListener(target);
   }
 
   /**
