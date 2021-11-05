@@ -1,4 +1,5 @@
 {
+    "projectId": "3dqsdt",
     "baseUrl": "http://localhost:8007",
     "integrationFolder": "cypress/tests",
     "screenshotOnRunFailure": true,
