@@ -86,18 +86,12 @@ Cypress.Commands.add('clickModalButton', (button) => {
 });
 
 // eslint-disable-next-line no-unused-vars
-Cypress.Commands.add('insertFormulaFromScratch', (formula, chem = false, paste = false) => {
+Cypress.Commands.add('insertFormulaFromScratch', () => {
   // Open the mathtype modal
-  cy
-    .clickButtonToOpenModal(chem);
 
   // Type the formula that matxes the previous inserted text on the mathtype modal
-  cy
-    .typeInModal(formula);
 
   // Insert the formula
-  cy
-    .clickModalButton('insert');
 });
 
 Cypress.Commands.add('getFormula', (formulaId) => {

@@ -45,22 +45,21 @@ declare namespace Cypress {
 
         /**
          * Insert a formula from scratch
-         * @param formula formula to append in the editor
-         * @param chem {default = false} whether to click the MathType or ChemType button
-         * @param paste {default = false} whether the text appended is typed or pasted. Not yet implemented
          */
-        insertFormulaFromScratch(formula: string, chem?: boolean, paste?: boolean)
+        insertFormulaFromScratch()
 
         /**
          * Obtain a formula from a given identifier.
-         * @param formulaId identifier of the formula to obtain. The identifier is the 0-indexed position of the formula inside the text editor.
+         * @param formulaId identifier of the formula to obtain. 
+         *  The identifier is the 0-indexed position of the formula inside the text editor.
          * @returns the formula
          */
         getFormula(formulaId: number): Chainable
 
         /**
          * Select a LaTeX formula from a given identifier.
-         * @param formulaId id of the formula to obtain. The id is the 0-indexed position of the formula inside the text editor.
+         * @param formulaId id of the formula to obtain. 
+         * The id is the 0-indexed position of the formula inside the text editor.
          * @returns the formula
          */
         selectLatexFormula(formulaId: number): Chainable
