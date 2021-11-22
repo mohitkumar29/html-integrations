@@ -6,14 +6,21 @@
 name: Run Cypress tests without cache
 
 on: 
-  - push
-  - workflow_dispatch
+  push:
+  pull_request:
+    types: [ opened, reopened]
+  workflow_dispatch:
+    inputs:
+      cyDashboard:
+        description: Run the tests on Cypress Dashboard? Write "Yes" or "No".
+        required: true
+        default: "No"
 
 jobs:
 
   setup-cypress:
     name: Setup and start the default app
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -23,7 +30,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 16
 
       # 05. Install dependencies and verify Cypress
       - name: Install dependencies and verify Cypress
@@ -43,7 +50,7 @@ jobs:
           npx cypress version --component node
 
   run-all-tests-matrix:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     needs: setup-cypress
 
@@ -55,7 +62,7 @@ jobs:
         # browser: ["chrome", "edge", "firefox", "chromium"]
         type: ["all"]
         # type: ["smoke","e2e", "ui", "validation"]
-
+    
     name: Run ${{ matrix.type }} tests on ${{ matrix.browser }}
 
     steps:
@@ -69,18 +76,36 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 16
 
+      # On push or when we specify we don't want to send the tests to Dashboard through workflow dispatch
+      # we set the environment variables dynamically to empty in order to avoid
+      # recording the test execution to Cypress Dashboard.
+      # - name: Set Dashboard flags to empty when push or worflow_dispatch
+      #  if: ${{ github.event_name == 'push' || github.event.inputs.cyDashboard == 'No' }}
+      #  run: |
+      #    echo "CY_RECORD_KEY=" >> $GITHUB_ENV
+      #    echo "CY_RECORD_FLAG=" >> $GITHUB_ENV
+
+      # We define the environment variables to send the test execution to the Cypress Dashboard
+      # on every pull request or when specifying to record the tests on workflow dispatch
+      # - name: Set Dashboard flags when pull_request or worflow_dispatch
+      #  if: ${{ github.event_name == 'pull_request' || github.event.inputs.cyDashboard == 'Yes' }}
+      #  run: |
+      #    echo "CY_RECORD_KEY=${{ secrets.CYPRESS_RECORD_KEY }}" >> $GITHUB_ENV
+      #    echo "CY_RECORD_FLAG=-- --record --key " >> $GITHUB_ENV
+     
       - name: Run tests by browser
         uses: cypress-io/github-action@v2
         timeout-minutes: 10
         with:
           # 'build' starts the defauld demo 
           build: npm run build
-          # 'test:ci' runs tests over Docker image for build context 
-          command: npm run test:ci
-          record: false
-          parallel: false
+          # 'test:ci' runs tests over Docker image for build context
+          # we also send the Cypress Dashboard record key dynamically
+          command: npm run test:ci # ${{ env.CY_RECORD_FLAG }} ${{ env.CY_RECORD_KEY }}
+          record: true
+          parallel: true
           group: "${{ matrix.type }} tests on ${{ matrix.browser }}"
           browser: ${{ matrix.browser }}
           config: "video: true"
@@ -88,13 +113,12 @@ jobs:
             cypress/tests/**/*.js
           # config: "\"video\": true, \"screenshotsFolder\": \"cypress/screenshots/${{ matrix.browser }}\", \"videosFolder\": \"cypress/videos/${{ matrix.browser }}\", \"video\": true"
           # spec: cypress/tests/${{ matrix.type }}/*.js
-        # env:
+        env:
         # https://github.com/cypress-io/cypress-example-kitchensink/settings/secrets
-            # screenshotsFolder: "cypress/screenshots/${{ matrix.browser }}"
-            # videosFolder: "cypress/videos/${{ matrix.browser }}"
+        #     # screenshotsFolder: "cypress/screenshots/${{ matrix.browser }}"
+        #     # videosFolder: "cypress/videos/${{ matrix.browser }}"
         #   TERM: xterm
-        #   CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
-        #   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GH_CICD_TOKEN }}
 
       # Save videos and screenshots as test artifacts
       # https://github.com/actions/upload-artifact

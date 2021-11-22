@@ -2,10 +2,10 @@
     "baseUrl": "http://localhost:8007",
     "integrationFolder": "cypress/tests",
     "screenshotOnRunFailure": true,
+    "projectId": "efpemq",
     "env":
     {
         "FAIL_FAST_STRATEGY": "run",
         "FAIL_FAST_ENABLED": true
     }
 }
-  
