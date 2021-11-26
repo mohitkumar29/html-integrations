@@ -58,6 +58,6 @@ They're recorded for each:
     * `No`: Default parameter. Will run the tests but won't send them to record on the Cypress Dashboard.
     * `Yes`: Use this string to indicate the action to send the test run to Cypress Dashboard.
 
-    Use this option to record the local pushed test executions only when necessary:
-    * Each time there’s a new push to an opened pull request with code that can change the test behaviour (e.g: modify the mathtype-devkit package)
-    * When created new tests for the first time, we want to detect the flaky ones. (we should have the flaky tests detected and handled before opening a pull request)
+        Use this option to record the local pushed test executions only when necessary:
+        * Each time there’s a new push to an opened pull request with code that can change the test behaviour (e.g: modify the mathtype-devkit package)
+        * When created new tests for the first time, we want to detect the flaky ones. (we should have the flaky tests detected and handled before opening a pull request)
