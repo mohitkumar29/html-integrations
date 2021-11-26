@@ -14,9 +14,8 @@ Last release of this project is was 30th of September 2021.
   Add Cypress Dashboard Support:
   
   - Add Cypress Dashboard credentials on the repository secrets.
-  - Update Actions Workflows to record tests on Cypress Dashboard on pull_request and worflow dispatch.
-  - Update testing README file.
-  - Add paralellization to the GitHub action Workflows
+  - Update with the secrets information.
+  - Update testing README file with good practices and how to do's.
 
 ## 7.27.2 - 2021-11-26
 
