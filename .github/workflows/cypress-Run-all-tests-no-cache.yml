@@ -9,12 +9,25 @@ on:
   push:
   pull_request:
     types: [ opened, reopened]
+  schedule:
+    # runs at minute 0 of the first day hour on the first day of the month for every month
+    - cron:  '0 1 1 * *'
+    # runs at the minute 0 of the first hour of every monday
+    - cron:  '0 1 * * 1'
+      filters:
+        branches:
+          only:
+            - master
   workflow_dispatch:
     inputs:
       cyDashboard:
         description: Run the tests on Cypress Dashboard? Write "Yes" or "No".
         required: true
         default: "No"
+      environment:
+        description: List of where to take the packages code from, 'local', 'public' or both.
+        required: true
+        default: "['local']"
 
 jobs:
 
@@ -49,21 +62,11 @@ jobs:
           npx cypress version --component electron
           npx cypress version --component node
 
-  run-all-tests-matrix:
+  define-env:
     runs-on: ubuntu-latest
-
     needs: setup-cypress
 
-    strategy:
-      fail-fast: true
-      matrix:
-        # Define values for browsers from
-        browser: ["chrome"]
-        # browser: ["chrome", "edge", "firefox", "chromium"]
-        type: ["all"]
-        # type: ["smoke","e2e", "ui", "validation"]
-    
-    name: Run ${{ matrix.type }} tests on ${{ matrix.browser }}
+    name: Define run environment
 
     steps:
       - uses: actions/checkout@master
@@ -78,24 +81,84 @@ jobs:
         with:
           node-version: 16
 
-      # On push or when we specify we don't want to send the tests to Dashboard through workflow dispatch
-      # we set the environment variables dynamically to empty in order to avoid
-      # recording the test execution to Cypress Dashboard.
-      # - name: Set Dashboard flags to empty when push or worflow_dispatch
-      #  if: ${{ github.event_name == 'push' || github.event.inputs.cyDashboard == 'No' }}
-      #  run: |
-      #    echo "CY_RECORD_KEY=" >> $GITHUB_ENV
-      #    echo "CY_RECORD_FLAG=" >> $GITHUB_ENV
+      - name: Set local environment to run tests for push and pull request
+        if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
+        run: |
+          echo "TESTS_ENV=['local']" >> $GITHUB_ENV
 
-      # We define the environment variables to send the test execution to the Cypress Dashboard
-      # on every pull request or when specifying to record the tests on workflow dispatch
+      - name: Set the environment to run the tests defined by the user
+        if: ${{ github.event.inputs.environment != '' }}
+        run: |
+          echo "TESTS_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+
+      - name: Schedule the tests to run with published packages monthly
+        if: ${{ github.event_name == 'schedule' && github.base_ref == 'stable' }}
+        run: |
+          echo "TESTS_ENV=['public']" >> $GITHUB_ENV
+
+      - name: Schedule the tests to run with the local and public packages every monday
+        if: ${{ github.event_name == 'schedule' && github.base_ref == 'master' }}
+        run: |
+          echo "TESTS_ENV=['local', 'public']" >> $GITHUB_ENV
+      
+      # export TESTS_ENV=${{ env.TESTS_ENV }}
+      - name: Export environment for test run
+        id: export-matrix-env
+        run: |
+          echo "::set-output name=tests_env::${{env.TESTS_ENV}}"
+
+    outputs:
+      tests-env: ${{ steps.export-matrix-env.outputs.tests_env }}
+
+  run-all-tests-matrix:
+    runs-on: ubuntu-latest
+
+    needs: define-env
+
+    strategy:
+      fail-fast: true
+      matrix:
+        # Define values for browsers from
+        browser: ["chrome"]
+        # browser: ["chrome", "edge", "firefox", "chromium"]
+        type: ["all"]
+        # type: ["smoke","e2e", "ui", "validation"]
+        env: ${{ fromJson(needs.define-env.outputs.tests-env) }}
+        # env: ["local", "public"]
+    
+    name: Run ${{ matrix.type }} tests on ${{ matrix.browser }} with ${{ matrix.env }} packages
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Checkout
+        uses: actions/checkout@v2
+    
+      # install a specific version of Node using
+      # https://github.com/actions/setup-node
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      # # On push o r when we specify we don't want to send the tests to Dashboard through workflow dispatch
+      # # we set the environment variables dynamically to empty in order to avoid
+      # # recording the test execution to Cypress Dashboard.    
+      # - name: Set Dashboard flags to empty when push or worflow_dispatch
+      #   if: ${{ github.event_name == 'push' || github.event.inputs.cyDashboard == 'No' }}
+      #   run: |
+      #     echo "CY_RECORD_KEY=" >> $GITHUB_ENV
+      #     echo "CY_RECORD_FLAG=" >> $GITHUB_ENV
+
+      # # We define the environment variables to send the test execution to the Cypress Dashboard
+      # # on every pull request or when specifying to record the tests on workflow dispatch
       # - name: Set Dashboard flags when pull_request or worflow_dispatch
       #  if: ${{ github.event_name == 'pull_request' || github.event.inputs.cyDashboard == 'Yes' }}
       #  run: |
       #    echo "CY_RECORD_KEY=${{ secrets.CYPRESS_RECORD_KEY }}" >> $GITHUB_ENV
       #    echo "CY_RECORD_FLAG=-- --record --key " >> $GITHUB_ENV
      
-      - name: Run tests by browser
+      - name: Run tests by browser on ${{ needs.define-env.output.name }}
         uses: cypress-io/github-action@v2
         timeout-minutes: 10
         with:
