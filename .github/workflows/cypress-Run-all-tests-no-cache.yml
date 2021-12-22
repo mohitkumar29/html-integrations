@@ -8,6 +8,8 @@ name: Run Cypress tests
 
 on: 
   push:
+  pull_request:
+    types: [ opened, reopened]
   schedule:
     # runs at the minute 0 of the first hour of every monday
     - cron:  '0 1 * * 1'
@@ -22,6 +24,10 @@ on:
         description: Run the tests on Cypress Dashboard? Write "Yes" or "No".
         required: true
         default: "No"
+      environment:
+        description: List of where to take the packages code from; 'local' is the current only option.
+        required: true
+        default: "['local']"
 
 jobs:
 
@@ -56,22 +62,14 @@ jobs:
           npx cypress version --component electron
           npx cypress version --component node
 
-  run-all-tests-matrix:
+  # This job will expose to the workflow a variable containing the data
+  # of where to take the packages code from (local or public)
+  # in order to use it to for matrix strategy when running the tests
+  define-env:
     runs-on: ubuntu-latest
-
     needs: setup-cypress
 
-    strategy:
-      fail-fast: true
-      matrix:
-        # Define values for browsers from
-        browser: ["chrome"]
-        # browser: ["chrome", "edge", "firefox", "chromium"]
-        type: ["all"]
-        # type: ["smoke","e2e", "ui", "validation"]
-        # env: ["local", "public"]
-    
-    name: Run ${{ matrix.type }} tests on ${{ matrix.browser }}
+    name: Define run environment
 
     steps:
       - uses: actions/checkout@master
@@ -86,11 +84,68 @@ jobs:
         with:
           node-version: 16
 
-      # On push o r when we specify we don't want to send the tests to Dashboard through workflow dispatch
+      # When the workflow runs through a push or a pull request, we want to test the local packages
+      - name: Set local environment to run tests for push and pull request
+        if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
+        run: |
+          echo "TESTS_ENV=['local']" >> $GITHUB_ENV
+
+      # When user runs manually the workflow, retrieve the setting that defines
+      # where to take the package code from
+      - name: Set the environment to run the tests defined by the user
+        if: ${{ github.event.inputs.environment != '' }}
+        run: |
+          echo "TESTS_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+
+      # On schedule, keep sending data to Cypress Dashboard with the public packages
+      - name: Schedule the tests to run with published packages monthly
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+          echo "TESTS_ENV=['public']" >> $GITHUB_ENV
+      
+      # export TESTS_ENV=${{ env.TESTS_ENV }}
+      - name: Export environment for test run
+        id: export-matrix-env
+        run: |
+          echo "::set-output name=tests_env::${{env.TESTS_ENV}}"
+    outputs:
+      tests-env: ${{ steps.export-matrix-env.outputs.tests_env }}
+
+  # Run all project tests following a matrix strategy
+  run-all-tests-matrix:
+    runs-on: ubuntu-latest
+
+    needs: define-env
+
+    strategy:
+      fail-fast: true
+      matrix:
+        # Define values for browsers from
+        browser: ["chrome"]
+        # browser: ["chrome", "edge", "firefox", "chromium"]
+        type: ["all"]
+        # type: ["smoke","e2e", "ui", "validation"]
+        env: ${{ fromJson(needs.define-env.outputs.tests-env) }}
+        # env: ["local", "public"]
+    
+    name: Run ${{ matrix.type }} tests on ${{ matrix.browser }} with ${{ matrix.env }} packages
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Checkout
+        uses: actions/checkout@v2
+    
+      # install a specific version of Node using
+      # https://github.com/actions/setup-node
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      # On push or when we specify we don't want to send the tests to Dashboard through workflow dispatch
       # we set the environment variables dynamically to empty in order to avoid
-      # recording the test execution to Cypress Dashboard.    
-      # echo "CY_RECORD_KEY=" >> $GITHUB_ENV
-          # echo "CY_RECORD_FLAG=" >> $GITHUB_ENV
+      # recording the test execution to Cypress Dashboard.  
       - name: Set Dashboard flags to empty when push or worflow_dispatch
         if: ${{ github.event_name == 'push' || github.event.inputs.cyDashboard == 'No' }}
         run: |
@@ -105,11 +160,11 @@ jobs:
           echo "CY_RECORD_KEY=${{ secrets.CYPRESS_RECORD_KEY }}" >> $GITHUB_ENV
           echo "CY_RECORD_FLAG=-- --record --key " >> $GITHUB_ENV
      
-      - name: Run tests by browser
+      - name: Run tests by browser with ${{ matrix.env }} packages
         uses: cypress-io/github-action@v2
         timeout-minutes: 10
         with:
-          # 'build' starts the defauld demo 
+          # 'build' starts the default demo 
           build: npm run build
           # 'test:ci' runs tests over Docker image for build context
           # we also send the Cypress Dashboard record key dynamically
