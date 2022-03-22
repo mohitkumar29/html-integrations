@@ -1,5 +1,7 @@
 {
   "packages": [
+    "demos/html5/**/*",
+    "demos/angular/**/*",
     "packages/*"
   ],
   "command": {
@@ -10,3 +12,4 @@
   },
   "version": "independent"
 }
+

@@ -39,6 +39,11 @@
         "demo": false,
         "port": ""
     },
+    "mathTinyMCE6": {
+        "path": "./packages/mathtype-tinymce6/",
+        "demo": false,
+        "port": ""
+    },
     "reactCKEditor5": {
         "path": "./demos/react/ckeditor5/",
         "demo": true,
