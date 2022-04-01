@@ -44,4 +44,6 @@ tinymce.init({
 document.getElementById('btn_update').addEventListener('click', (e) => {
   e.preventDefault();
   Generic.updateContent(tinyMCE.activeEditor.getContent(), 'transform_content');            //eslint-disable-line
+  console.log(WirisPlugin.Parser.initParse(tinyMCE.activeEditor.getContent()))
+  tinyMCE.activeEditor.setContent(WirisPlugin.Parser.initParse(tinyMCE.activeEditor.getContent()));
 });

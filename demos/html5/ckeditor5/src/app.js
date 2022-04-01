@@ -1,11 +1,12 @@
 // Load scripts.
-import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor';
-import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
-import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph';
-import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold';
-import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
-import Alignment from '@ckeditor/ckeditor5-alignment/src/alignment';
-import MathType from '@wiris/mathtype-ckeditor5/src/plugin';
+// import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor';
+import * as ClassicEditor from '../ckeditor';
+// import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
+// import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph';
+// import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold';
+// import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
+// import Alignment from '@ckeditor/ckeditor5-alignment/src/alignment';
+// import MathType from '@wiris/mathtype-ckeditor5/src/plugin';
 
 // Load styles.
 import './static/style.css';
@@ -27,8 +28,9 @@ window.editor = null;
 // Create the CKeditor5.
 ClassicEditor
   .create(document.querySelector('#editor'), {
-    plugins: [Essentials, Paragraph, Bold, Italic, MathType, Alignment],
-    toolbar: ['bold', 'italic', 'MathType', 'ChemType', 'alignment:left', 'alignment:center', 'alignment:right'],
+    toolbar: [ 'heading', '|', 'bold', 'italic', 'MathType', 'ChemType' ],
+    htmlAllowedTags:  ['.*'],
+    htmlAllowedAttrs: ['.*'],
     // language: 'de',
     // mathTypeParameters: {
     //   editorParameters: { language: 'es' }, // MathType config, including language
