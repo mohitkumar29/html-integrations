@@ -1,4 +1,5 @@
 import IntegrationModel from '@wiris/mathtype-html-integration-devkit/src/integrationmodel';
+import Configuration from '@wiris/mathtype-html-integration-devkit/src/configuration';
 import Parser from '@wiris/mathtype-html-integration-devkit/src/parser';
 import Util from '@wiris/mathtype-html-integration-devkit/src/util';
 import formulaIcon from './icons/formula.png';
@@ -127,7 +128,8 @@ export default class GenericIntegration extends IntegrationModel {
     const customEditors = this.getCore().getCustomEditors();
     // Iterate from all custom editors.
     for (const customEditor in customEditors.editors) {
-      if (customEditors.editors[customEditor].confVariable) {
+      // Check if CustomEditor is enabled
+      if (Configuration.get(customEditors.editors[customEditor].confVariable)) {
         const customEditorButton = document.createElement('img');
         // TODO make this work and add promises polyfill
         // import('./icons/' + customEditors.editors[customEditor].icon).then(({default: customEditorIcon}) => {

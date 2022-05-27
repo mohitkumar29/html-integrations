@@ -391,7 +391,8 @@ export const currentInstance = null;
       // Dynamic customEditors buttons.
       const customEditors = WirisPlugin.instances[editor.id].getCore().getCustomEditors();
       Object.keys(customEditors.editors).forEach((customEditor) => {
-        if (customEditors.editors[customEditor].confVariable) {
+        // Check if CustomEditor is enabled
+        if (Configuration.get(customEditors.editors[customEditor].confVariable)) {
           commonEditor.addMenuItem(`tiny_mce_wiris_formulaEditor${customEditors.editors[customEditor].name}`, {
             text: customEditors.editors[customEditor].title,
             icon: chemTypeIcon, // Parametrize when other custom editors are added.
@@ -417,7 +418,8 @@ export const currentInstance = null;
 
       // Dynamic customEditors buttons.
       for (const customEditor in customEditors.editors) {
-        if (customEditors.editors[customEditor].confVariable) {
+        // Check if CustomEditor is enabled
+        if (Configuration.get(customEditors.editors[customEditor].confVariable)) {
           const cmd = `tiny_mce_wiris_openFormulaEditor${customEditors.editors[customEditor].name}`;
           // eslint-disable-next-line no-inner-declarations, no-loop-func
           function commandFunction() {

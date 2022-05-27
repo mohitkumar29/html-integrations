@@ -85,6 +85,24 @@ export class FroalaIntegration extends IntegrationModel {
     });
 
     super.init();
+
+    // Hide if MathType editor is enabled (true by default)
+    if (!Configuration.get('editorEnabled')) {
+      // eslint-disable-next-line no-undef
+      $.FroalaEditor.ICONS.wirisEditor = null;
+      // eslint-disable-next-line no-undef
+      $.FroalaEditor.COMMANDS.wirisEditor = null;
+      document.getElementById('wirisEditor-1').classList.add('fr-hidden');
+    }
+
+    // Hide if ChemType editor is enabled (true by default)
+    if (!Configuration.get('chemEnabled')) {
+      // eslint-disable-next-line no-undef
+      $.FroalaEditor.ICONS.wirisChemistry = null;
+      // eslint-disable-next-line no-undef
+      $.FroalaEditor.COMMANDS.wirisChemistry = null;
+      document.getElementById('wirisChemistry-1').classList.add('fr-hidden');
+    }
   }
 
   /**

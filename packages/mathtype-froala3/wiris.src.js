@@ -88,6 +88,20 @@ export class FroalaIntegration extends IntegrationModel {
     });
 
     super.init();
+
+    // Hide if MathType editor is enabled (true by default)
+    if (!Configuration.get('editorEnabled')) {
+      FroalaEditor.ICONS.wirisEditor = null;
+      FroalaEditor.COMMANDS.wirisEditor = null;
+      document.getElementById('wirisEditor-1').classList.add('fr-hidden');
+    }
+
+    // Hide if ChemType editor is enabled (true by default)
+    if (!Configuration.get('chemEnabled')) {
+      FroalaEditor.ICONS.wirisChemistry = null;
+      FroalaEditor.COMMANDS.wirisChemistry = null;
+      document.getElementById('wirisChemistry-1').classList.add('fr-hidden');
+    }
   }
 
   /**
@@ -255,84 +269,82 @@ export class FroalaIntegration extends IntegrationModel {
     // Init method, here we create the instance of the FroalaIntegration class.
     function _init() {
       createIntegrationModel(editor);
+
+      // Icon templates for MathType.
+      FroalaEditor.DefineIconTemplate('wirisplugin', '<i class="icon icon-[NAME]"></i>');
+      FroalaEditor.DefineIcon('wirisEditor', { NAME: 'mathtype-editor', template: 'wirisplugin' });
+      // Register the command for MathType formulas.
+      FroalaEditor.RegisterCommand('wirisEditor', {
+        title: 'Insert a math equation - MathType',
+        focus: true,
+        undo: true,
+        refreshAfterCallback: true,
+        callback(editorObject) { // eslint-disable-line no-unused-vars
+          const currentFroalaIntegrationInstance = WirisPlugin.instances[this.id];
+          currentFroalaIntegrationInstance.hidePopups();
+          currentFroalaIntegrationInstance.core.getCustomEditors().disable();
+          const imageObject = currentFroalaIntegrationInstance.editorObject.image.get();
+          if (typeof imageObject !== 'undefined' && imageObject !== null && imageObject[0].classList.contains(WirisPlugin.Configuration.get('imageClassName'))) {
+            currentFroalaIntegrationInstance.core.editionProperties.temporalImage = imageObject[0];
+            currentFroalaIntegrationInstance.openExistingFormulaEditor();
+          } else {
+            currentFroalaIntegrationInstance.openNewFormulaEditor();
+          }
+        },
+      });
+
+      // Prevent Froala to add it's own classes to the images generated with MathType.
+      FroalaEditor.COMMANDS.wirisEditor.refresh = function ($btn) {
+        const selectedImage = this.image.get();
+        // Value can be undefined.
+        if (selectedImage) {
+          if (($btn.parent()[0].hasAttribute('class') && $btn.parent()[0].getAttribute('class').indexOf('fr-buttons') === -1) || (selectedImage[0]
+                && (selectedImage[0].classList.contains(Configuration.get('imageClassName')) || selectedImage[0].contents().classList.contains(Configuration.get('imageClassName'))))) { // Is a MathType image.
+            // Show MathType icons if previously were hidden.
+            $btn.removeClass('fr-hidden');
+            // Disable resize box.
+            if (!document.getElementById('wrs_style')) { // eslint-disable-line no-undef
+              document.getElementsByTagName('head')[0].append('<style id="wrs_style">.fr-image-resizer {pointer-events: none;}</style>');
+            }
+          } else { // Is a non-MathType image.
+            // Hide MathType icons.
+            $btn.addClass('fr-hidden');
+            // Enable resize box (if it was configured).
+            if (document.getElementById('wrs_style')) {
+              document.getElementById('wrs_style').remove();
+            }
+          }
+        }
+      };
+
+      // Template for ChemType.
+      FroalaEditor.DefineIcon('wirisChemistry', { NAME: 'mathtype-chemistry', template: 'wirisplugin' });
+
+      // Register the command for ChemType formulas.
+      FroalaEditor.RegisterCommand('wirisChemistry', {
+        title: 'Insert a chemistry formula - ChemType',
+        focus: true,
+        undo: true,
+        refreshAfterCallback: true,
+        callback() {
+          const currentFroalaIntegrationInstance = WirisPlugin.instances[this.id];
+          currentFroalaIntegrationInstance.hidePopups();
+          currentFroalaIntegrationInstance.core.getCustomEditors().enable('chemistry');
+          const imageObject = currentFroalaIntegrationInstance.editorObject.image.get();
+          if (typeof imageObject !== 'undefined' && imageObject !== null && imageObject[0].classList.contains(WirisPlugin.Configuration.get('imageClassName'))) {
+            currentFroalaIntegrationInstance.core.editionProperties.temporalImage = imageObject[0];
+            currentFroalaIntegrationInstance.openExistingFormulaEditor();
+          } else {
+            currentFroalaIntegrationInstance.openNewFormulaEditor();
+          }
+        },
+      });
+      // Prevent Froala to add it's own classes to the images generated with ChemType.
+      FroalaEditor.COMMANDS.wirisChemistry.refresh = FroalaEditor.COMMANDS.wirisEditor.refresh;
     }
 
     return {
       _init,
     };
   };
-
-  // Icon templates for MathType.
-  FroalaEditor.DefineIconTemplate('wirisplugin', '<i class="icon icon-[NAME]"></i>');
-  FroalaEditor.DefineIcon('wirisEditor', { NAME: 'mathtype-editor', template: 'wirisplugin' });
-
-  // Register the command for MathType formulas.
-  FroalaEditor.RegisterCommand('wirisEditor', {
-    title: 'Insert a math equation - MathType',
-    focus: true,
-    undo: true,
-    refreshAfterCallback: true,
-    callback(editorObject) { // eslint-disable-line no-unused-vars
-      const currentFroalaIntegrationInstance = WirisPlugin.instances[this.id];
-      currentFroalaIntegrationInstance.hidePopups();
-      currentFroalaIntegrationInstance.core.getCustomEditors().disable();
-      const imageObject = currentFroalaIntegrationInstance.editorObject.image.get();
-      if (typeof imageObject !== 'undefined' && imageObject !== null && imageObject[0].classList.contains(WirisPlugin.Configuration.get('imageClassName'))) {
-        currentFroalaIntegrationInstance.core.editionProperties.temporalImage = imageObject[0];
-        currentFroalaIntegrationInstance.openExistingFormulaEditor();
-      } else {
-        currentFroalaIntegrationInstance.openNewFormulaEditor();
-      }
-    },
-  });
-
-  // Prevent Froala to add it's own classes to the images generated with MathType.
-  FroalaEditor.COMMANDS.wirisEditor.refresh = function ($btn) {
-    const selectedImage = this.image.get();
-    // Value can be undefined.
-    if (selectedImage) {
-      if (($btn.parent()[0].hasAttribute('class') && $btn.parent()[0].getAttribute('class').indexOf('fr-buttons') === -1) || (selectedImage[0]
-                && (selectedImage[0].classList.contains(Configuration.get('imageClassName')) || selectedImage[0].contents().classList.contains(Configuration.get('imageClassName'))))) { // Is a MathType image.
-        // Show MathType icons if previously were hidden.
-        $btn.removeClass('fr-hidden');
-        // Disable resize box.
-        if (!document.getElementById('wrs_style')) { // eslint-disable-line no-undef
-          document.getElementsByTagName('head')[0].append('<style id="wrs_style">.fr-image-resizer {pointer-events: none;}</style>');
-        }
-      } else { // Is a non-MathType image.
-        // Hide MathType icons.
-        $btn.addClass('fr-hidden');
-        // Enable resize box (if it was configured).
-        if (document.getElementById('wrs_style')) {
-          document.getElementById('wrs_style').remove();
-        }
-      }
-    }
-  };
-
-  // Template for ChemType.
-  FroalaEditor.DefineIcon('wirisChemistry', { NAME: 'mathtype-chemistry', template: 'wirisplugin' });
-
-  // Register the command for ChemType formulas.
-  FroalaEditor.RegisterCommand('wirisChemistry', {
-    title: 'Insert a chemistry formula - ChemType',
-    focus: true,
-    undo: true,
-    refreshAfterCallback: true,
-    callback() {
-      const currentFroalaIntegrationInstance = WirisPlugin.instances[this.id];
-      currentFroalaIntegrationInstance.hidePopups();
-      currentFroalaIntegrationInstance.core.getCustomEditors().enable('chemistry');
-      const imageObject = currentFroalaIntegrationInstance.editorObject.image.get();
-      if (typeof imageObject !== 'undefined' && imageObject !== null && imageObject[0].classList.contains(WirisPlugin.Configuration.get('imageClassName'))) {
-        currentFroalaIntegrationInstance.core.editionProperties.temporalImage = imageObject[0];
-        currentFroalaIntegrationInstance.openExistingFormulaEditor();
-      } else {
-        currentFroalaIntegrationInstance.openNewFormulaEditor();
-      }
-    },
-  });
-
-  // Prevent Froala to add it's own classes to the images generated with ChemType.
-  FroalaEditor.COMMANDS.wirisChemistry.refresh = FroalaEditor.COMMANDS.wirisEditor.refresh;
 }(FroalaEditor));
