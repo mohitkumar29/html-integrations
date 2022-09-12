@@ -1,19 +1,54 @@
 {
     "root": "demos/html5/generic",
+    "sourceRoot": "demos/html5/generic/src",
     "targets": {
       "start": {
         "executor": "nx:run-script",
         "options": {
             "script": "start"
-        },
-        "outputs": ["demos/html5/generic/dist/demo.js"]
+        }
       },
       "start-remote": {
         "executor": "nx:run-script",
         "options": {
             "script": "start-remote"
-        },
-        "outputs": ["demos/html5/generic/dist/demo.js"]
+        }
+      },
+      "build": {
+        "executor": "@nrwl/web:webpack",
+        "outputs": ["{options.outputPath}"],
+        "options": {
+          "main": "demos/html5/generic/src/app.js",
+          "outputPath": "demos/html5/generic/dist",
+          "tsConfig": "demos/html5/generic/tsconfig.app.json",
+          "index": "demos/html5/generic/index.html",
+          "deleteOutputPath": false,
+          "webpackConfig": "demos/html5/generic/webpack.config.js"
+        }
+      },
+      "serve": {
+        "executor": "@nrwl/web:dev-server",
+        "dependsOn": ["start"],
+        "options": {
+          "buildTarget": "html-generic:build",
+          "hmr": true,
+          "liveReaload": true,
+          "port": 8007,
+          "watch": true,
+          "webpackConfig": "demos/html5/generic/webpack.config.js"
+        }
+      },
+      "serve-remote": {
+        "executor": "@nrwl/web:dev-server",
+        "dependsOn": ["start-remote"],
+        "options": {
+          "buildTarget": "html-generic:build",
+          "hmr": true,
+          "liveReaload": true,
+          "port": 8007,
+          "watch": true,
+          "webpackConfig": "demos/html5/generic/webpack.config.js"
+        }
       },
       "lint": {
         "executor": "@nrwl/linter:eslint",
