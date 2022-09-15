@@ -1,19 +1,48 @@
 {
-    "root": "demos/html5/tinymce6",
+  "root": "demos/html5/tinymce6",
+  "sourceRoot": "demos/html5/tinymce6/src",
     "targets": {
       "start": {
         "executor": "nx:run-script",
+        "dependsOn": ["^build"],
         "options": {
             "script": "start"
-        },
-        "outputs": ["demos/html5/tinymce6/dist/demo.js"]
+        }
       },
       "start-remote": {
         "executor": "nx:run-script",
         "options": {
             "script": "start-remote"
-        },
-        "outputs": ["demos/html5/tinymce6/dist/demo.js"]
+        }
+      },
+      "build": {
+        "executor": "@nrwl/web:webpack",
+        "dependsOn": ["start"],
+        "outputs": ["{options.outputPath}"],
+        "options": {
+          "main": "demos/html5/tinymce6/src/app.js",
+          "outputPath": "dist",
+          "tsConfig": "tsconfig.app.json",
+          "generateIndexHtml": false,
+          "index": "",
+          "webpackConfig": "demos/html5/tinymce6/webpack.config.js"
+        }
+      },
+      "serve": {
+        "executor": "@nrwl/web:dev-server",
+        "dependsOn": ["start"],
+        "options": {
+          "buildTarget": "html-tinymce6:build",
+          "webpackConfig": "demos/html5/tinymce6/webpack.config.js"
+        }
+      },
+      "serve-remote": {
+        "executor": "@nrwl/web:dev-server",
+        "dependsOn": ["start-remote"],
+        "options": {
+          "buildTarget": "html-tinymce6:build",
+          "webpackConfig": "demos/html5/tinymce6/webpack.config.js"
+        }
       },
       "lint": {
         "executor": "@nrwl/linter:eslint",

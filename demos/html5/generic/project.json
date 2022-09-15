@@ -4,6 +4,7 @@
     "targets": {
       "start": {
         "executor": "nx:run-script",
+        "dependsOn": ["^build"],
         "options": {
             "script": "start"
         }
@@ -16,13 +17,14 @@
       },
       "build": {
         "executor": "@nrwl/web:webpack",
+        "dependsOn": ["start"],
         "outputs": ["{options.outputPath}"],
         "options": {
           "main": "demos/html5/generic/src/app.js",
-          "outputPath": "demos/html5/generic/dist",
-          "tsConfig": "demos/html5/generic/tsconfig.app.json",
-          "index": "demos/html5/generic/index.html",
-          "deleteOutputPath": false,
+          "outputPath": "dist",
+          "tsConfig": "tsconfig.app.json",
+          "generateIndexHtml": false,
+          "index": "",
           "webpackConfig": "demos/html5/generic/webpack.config.js"
         }
       },
@@ -31,10 +33,6 @@
         "dependsOn": ["start"],
         "options": {
           "buildTarget": "html-generic:build",
-          "hmr": true,
-          "liveReaload": true,
-          "port": 8007,
-          "watch": true,
           "webpackConfig": "demos/html5/generic/webpack.config.js"
         }
       },
@@ -43,10 +41,6 @@
         "dependsOn": ["start-remote"],
         "options": {
           "buildTarget": "html-generic:build",
-          "hmr": true,
-          "liveReaload": true,
-          "port": 8007,
-          "watch": true,
           "webpackConfig": "demos/html5/generic/webpack.config.js"
         }
       },

@@ -2,7 +2,6 @@ import TextCache from './textcache';
 import ServiceProvider from './serviceprovider';
 import MathML from './mathml';
 import StringManager from './stringmanager';
-
 /**
  * @classdesc
  * This class represents MathType accessible class. Converts MathML to accessible text and manages

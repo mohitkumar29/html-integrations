@@ -1,14 +1,29 @@
-//const path = require('path');
-const { merge } = require('webpack-merge');
+const path = require('path');
 
 module.exports = (config, context) => {
-  return merge(config, {
+  return {
+    entry: {
+      app: path.resolve(__dirname, 'src/app.js'),
+    },
+    output: {
+      path: path.resolve(__dirname, 'dist'),
+      filename: 'demo.js',
+    },
     devServer: {
+      devMiddleware: {
+        writeToDisk: true,
+      },
+      static: {
+        directory: path.join(__dirname, "./")
+      },
+      onListening: !config.devServer ? '' : config.devServer.onListening,
       open: true,
+      port: 8007,
+      hot: true,
+      host: '0.0.0.0'
     },
-    resolve: {
-      modules: ['node_modules'],
-    },
+    watch: false,
+    mode: 'development',
     module: {
       rules: [
         {
@@ -23,7 +38,7 @@ module.exports = (config, context) => {
           },
         },
         {
-          test: /\.scss$/,
+          test: /\.css$/,
           use: ['style-loader', 'css-loader'],
         },
         {
@@ -48,6 +63,9 @@ module.exports = (config, context) => {
           loader: 'html-loader',
         },
       ],
-    }
-  });
+    },
+    stats: {
+      colors: true,
+    },
+  };
 };
