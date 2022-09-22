@@ -155,12 +155,12 @@ export default class GenericIntegration extends IntegrationModel {
       }
     }
   }
-
   /**
      * @inheritdoc
      * @param {HTMLElement} element - DOM object target.
      */
   doubleClickHandler(element) {
+    console.log('a');
     this.core.editionProperties.temporalImage = element;
     super.doubleClickHandler(element);
   }
