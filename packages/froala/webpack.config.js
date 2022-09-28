@@ -1,14 +1,28 @@
 const path = require('path');
 const webpack = require('webpack');
 const TerserPlugin = require("terser-webpack-plugin");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-module.exports = {
+module.exports = (config, context) => {
+  return {
     entry: {
-        app: './global.js'
+      app: path.resolve(__dirname, './global.js'),
     },
     output: {
-        path: path.resolve(__dirname, ''),
-        filename: './wiris.js'
+      path: path.resolve(__dirname, ''),
+      filename: './wiris.js'
+    },
+    devServer: {
+      devMiddleware: {
+        writeToDisk: true,
+      },
+      static: {
+        directory: path.join(__dirname, "./")
+      },
+      onListening: !config.devServer ? '' : config.devServer.onListening,
+      hot: true,
+      port: 9004,
+      host: '0.0.0.0'
     },
     // Set watch to true for dev purposes.
     watch: false,
@@ -24,6 +38,7 @@ module.exports = {
             extractComments: false,
         })],
     },
+    mode: 'development',
     module: {
         rules: [
             {
@@ -66,9 +81,16 @@ module.exports = {
         colors: true
     },
     plugins: [
-        new webpack.EnvironmentPlugin({
-            'SERVICE_PROVIDER_URI': 'https://www.wiris.net/demo/plugins/app',
-            'SERVICE_PROVIDER_SERVER': 'java',
-        }),
+      new webpack.EnvironmentPlugin({
+          'SERVICE_PROVIDER_URI': 'https://www.wiris.net/demo/plugins/app',
+          'SERVICE_PROVIDER_SERVER': 'java',
+      }),
+      new CleanWebpackPlugin({
+        root: process.cwd(),
+        verbose: true,
+        dry: false,
+        cleanOnceBeforeBuildPatterns: ["app.*"]
+      }),
     ],
+  }
 };

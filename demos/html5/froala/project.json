@@ -4,7 +4,6 @@
   "targets": {
     "start": {
       "executor": "nx:run-script",
-      "dependsOn": ["^build"],
       "options": {
           "script": "start"
       }
@@ -30,7 +29,6 @@
     },
     "serve": {
       "executor": "@nrwl/web:dev-server",
-      "dependsOn": ["start"],
       "options": {
         "buildTarget": "html-froala:build",
         "webpackConfig": "demos/html5/froala/webpack.config.js"

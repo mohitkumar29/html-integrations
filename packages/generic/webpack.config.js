@@ -78,13 +78,16 @@ module.exports = (config, context) => {
         colors: true
     },
     plugins: [
-        new webpack.EnvironmentPlugin({
-            'SERVICE_PROVIDER_URI': 'https://www.wiris.net/demo/plugins/app',
-            'SERVICE_PROVIDER_SERVER': 'java',
-        }),
-        new CleanWebpackPlugin({
-          exclude: ['./icons/', './esdoc.json'],
-        }),
+      new webpack.EnvironmentPlugin({
+          'SERVICE_PROVIDER_URI': 'https://www.wiris.net/demo/plugins/app',
+          'SERVICE_PROVIDER_SERVER': 'java',
+      }),
+      new CleanWebpackPlugin({
+        root: process.cwd(),
+        verbose: true,
+        dry: false,
+        cleanOnceBeforeBuildPatterns: ["app.*"]
+      }),
     ],
   }
 };
