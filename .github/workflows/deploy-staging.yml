@@ -92,6 +92,7 @@ jobs:
 
       - name: Build the demos
         run: |
+          npm set "//registry.npmjs.org/:_authToken" ${{ secrets.NPM_TOKEN }}
           yarn
           yarn nx build ${{ matrix.editor }}
           yarn nx build ${{ matrix.framework }}-${{ matrix.editor }}
