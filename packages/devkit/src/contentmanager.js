@@ -227,7 +227,7 @@ export default class ContentManager {
   addEditorAsExternalDependency() {
     const script = document.createElement('script');
     script.type = 'text/javascript';
-    let editorUrl = Configuration.get('editorUrl');
+    let editorUrl = 'https://pre-www.wiris.net/demo/editor/editor';
     // We create an object url for parse url string and work more efficiently.
     const anchorElement = document.createElement('a');
 
@@ -605,7 +605,7 @@ export default class ContentManager {
               keyboardEvent.preventDefault();
             }
           }
-        }     
+        }
       } else if (keyboardEvent.key === 'Tab') { // Code to detect Tab event.
         if (document.activeElement === this.modalDialogInstance.cancelButton) {
           // Focus is on X button.
