@@ -74,7 +74,8 @@ export default class GenericIntegration extends IntegrationModel {
     integrationModelProperties.version = packageInfo.version;
     integrationModelProperties.scriptName = 'wirisplugin-generic.js';
     integrationModelProperties.environment = {};
-    integrationModelProperties.environment.editor = 'GenericHTML';
+    if (integrationModelProperties.integrationParameters?.editorParameters?.onlyoffice) integrationModelProperties.environment.editor = 'OnlyOffice ';
+    else integrationModelProperties.environment.editor = 'GenericHTML';
     integrationModelProperties.environment.editorVersion = '1.0.0';
 
     super(integrationModelProperties);

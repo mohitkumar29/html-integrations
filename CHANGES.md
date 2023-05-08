@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Last release of this project is was 30th of September 2021.
 
+### Unreleased
+
+  - Feat: add OnlyOffice to Telemetry. #KB-34448
+
 ### 8.3.0 2023-05-02
 
   - Fix: detect if device is mobile. #KB-33529
