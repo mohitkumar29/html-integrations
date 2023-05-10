@@ -15,8 +15,6 @@ Easily include quality math equations in your documents and digital content.
   * [Install instructions](#install-instructions)
     * [Java](#java)
     * [PHP](#php)
-    * [ASP .NET](#asp-net)
-    * [Ruby on Rails](#ruby-on-rails)
 - [Displaying on Target Page](#displaying-on-target-page)
 - [Documentation](#documentation)
 - [Privacy policy](#privacy-policy)
@@ -60,12 +58,31 @@ To integrate MathType, please follow the steps below. Please, note you may adjus
      genericIntegrationProperties.target = document.getElementById('htmlEditor');
      genericIntegrationProperties.toolbar = document.getElementById('toolbar');
 
+     // Integrations parameters, like setting a different language for MathType editor.
+     // genericIntegrationProperties.integrationParameters = editorParameters: { language: 'es' };
+
      // GenericIntegration instance.
      var genericIntegrationInstance = new WirisPlugin.GenericIntegration(genericIntegrationProperties);
      genericIntegrationInstance.init();
      genericIntegrationInstance.listeners.fire('onTargetReady', {});
 
      WirisPlugin.currentInstance = this.wiris_generic;
+   </script>
+   ```
+
+   You could also use the window funcion `wrs_int_init` as follows:
+      ```html
+   <script>
+     const target = document.getElementById('htmlEditor');
+     const toolbar = document.getElementById('toolbar');
+
+     // Integrations parameters, like setting a different language for MathType editor.
+     // const mathTypeParameters = {
+     //   editorParameters: { language: 'es' },
+     // };
+
+     // Initialyze the editor.
+    window.wrs_int_init(target, toolbar, /*mathTypeParameters*/);
    </script>
    ```
 
@@ -195,6 +212,9 @@ To install the Java services, please, follow the steps below:
       genericIntegrationProperties.target = document.getElementById('htmlEditor');
       genericIntegrationProperties.toolbar = document.getElementById('toolbar');
 
+      // Integrations parameters, like setting a different language for MathType editor.
+      // genericIntegrationProperties.integrationParameters = editorParameters: { language: 'es' };
+
       // We just added this line:
       genericIntegrationProperties.configurationService = '/pluginwiris_engine/app/configurationjs';
 
@@ -232,77 +252,8 @@ To install the PHP services, please, follow the steps below:
       // We just added this line:
       genericIntegrationProperties.configurationService = 'integration/configurationjs.php';
 
-      // GenericIntegration instance.
-      var genericIntegrationInstance = new WirisPlugin.GenericIntegration(genericIntegrationProperties);
-      genericIntegrationInstance.init();
-      genericIntegrationInstance.listeners.fire('onTargetReady', {});
-
-      WirisPlugin.currentInstance = this.wiris_generic;
-    </script>
-    ```
-
-#### ASP .NET
-
-To install the ASP .NET services, please, follow the steps below:
-
-1. Download and extract [MathType for generic HTML editor - ASP.NET](https://store.wiris.com/en/products/downloads/mathtype/integrations#froala?utm_source=npmjs&utm_medium=referral).
-
-2. Copy the `generic_wiris/integration` directory into your project.
-
-3. Set the following value for the `configurationService` property:
-
-    ```js
-    genericIntegrationProperties.configurationService = 'integration/configurationjs.aspx';
-    ```
-
-    The previous example would end up like this:
-
-    ```js
-    <script>
-      var genericIntegrationProperties = {};
-      genericIntegrationProperties.target = document.getElementById('htmlEditor');
-      genericIntegrationProperties.toolbar = document.getElementById('toolbar');
-
-      // We just added this line:
-      genericIntegrationProperties.configurationService = 'integration/configurationjs.aspx';
-
-      // GenericIntegration instance.
-      var genericIntegrationInstance = new WirisPlugin.GenericIntegration(genericIntegrationProperties);
-      genericIntegrationInstance.init();
-      genericIntegrationInstance.listeners.fire('onTargetReady', {});
-
-      WirisPlugin.currentInstance = this.wiris_generic;
-    </script>
-    ```
-
-#### Ruby on Rails
-
-To install the Ruby on Rails services, please, follow the steps below:
-
-1. Download and extract [MathType for generic HTML editor - Ruby on Rails](https://store.wiris.com/en/products/downloads/mathtype/integrations#froala?utm_source=npmjs&utm_medium=referral).
-
-2. Install the **wirispluginengine.gem** gem.
-
-    ```
-    gem install -l wirispluginengine.gem
-    ```
-
-3. Set the following value for the `configurationService` property:
-
-    ```js
-    genericIntegrationProperties.configurationService = '/wirispluginengine/integration/configurationjs';
-    ```
-
-    The previous example would end up like this:
-
-    ```js
-    <script>
-      var genericIntegrationProperties = {};
-      genericIntegrationProperties.target = document.getElementById('htmlEditor');
-      genericIntegrationProperties.toolbar = document.getElementById('toolbar');
-
-      // We just added this line:
-      genericIntegrationProperties.configurationService = '/wirispluginengine/integration/configurationjs';
+      // Integrations parameters, like setting a different language for MathType editor.
+      // genericIntegrationProperties.integrationParameters = editorParameters: { language: 'es' };
 
       // GenericIntegration instance.
       var genericIntegrationInstance = new WirisPlugin.GenericIntegration(genericIntegrationProperties);
