@@ -86,7 +86,7 @@ export default class Image {
     let svgString;
     if (jsonResponse) {
       // Cleaning data:image/png;base64.
-      if (Configuration.get('imageFormat') === 'svg') {
+      if (true && Configuration.get('imageFormat') === 'svg') {
         // SVG format.
         // If SVG is encoded in base64 we need to convert the base64 bytes into a SVG string.
         if (Configuration.get('saveMode') !== 'base64') {
@@ -102,6 +102,7 @@ export default class Image {
         }
         // PNG format: we store all metrics information in the first 88 bytes.
       } else {
+        console.log(img.src);
         base64String = img.src.substr(img.src.indexOf('base64,') + 7, img.src.length);
         bytes = Util.b64ToByteArray(base64String, 88);
         ar = Image.getMetricsFromBytes(bytes);
