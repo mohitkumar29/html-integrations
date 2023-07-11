@@ -49,11 +49,13 @@ export async function processJsonResponse(response: Promise<Response>): Promise<
 export async function callService(query: object, serviceName: string, method: MethodType, serverURL: string, extension: string) : Promise<any> {
   try {
     const url = new URL(serviceName + extension, serverURL);
+    const signal = AbortSignal.timeout(8000);
     const init: RequestInit = {
       method,
       headers: {
         'Content-type': 'application/x-www-form-urlencoded; charset=utf-8',
       },
+      signal,
     };
 
     if (method === MethodType.Get) {
