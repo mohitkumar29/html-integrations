@@ -4859,6 +4859,15 @@
   resolved "https://registry.yarnpkg.com/@webpack-cli/serve/-/serve-2.0.5.tgz#325db42395cd49fe6c14057f9a900e427df8810e"
   integrity sha512-lqaoKnRYBdo1UgDX8uF24AfGMifWK19TxPmM5FHc2vAGxrJ/qtyUyFBWoY1tISZdelsQ5fBcOusifo5o5wSJxQ==
 
+"@wiris/mathtype-html-integration-devkit@1.13.0":
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/@wiris/mathtype-html-integration-devkit/-/mathtype-html-integration-devkit-1.13.0.tgz#c70db9af44f9e7818d890b88495ce9e626a17984"
+  integrity sha512-2bTdsh3DDRKjMoRz+nOU/zFayi8RQqxGTGe+62oOQVkM8t5yCvuGrX/eueqOPlVfFrCi8olU82LmUDQcuY7GCw==
+  dependencies:
+    dompurify "^2.3.9"
+    raw-loader "^4.0.2"
+    uuid "^8.3.2"
+
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@xtuc/ieee754/-/ieee754-1.2.0.tgz#eef014a3145ae477a1cbc00cd1e552336dceb790"
