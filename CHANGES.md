@@ -13,6 +13,7 @@ Last release of this project is was 30th of September 2021.
 
   - fix(ck5): setData understanding math LaTeX. #KB-39004
   - fix: DomPurify replacing undesired characters. KB-39549
+  - fix: Froala + Generic not setting GUI parameters. #KB-40561
 
 ### 8.6.0 2023-10-10
 
